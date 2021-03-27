@@ -13,10 +13,11 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public class MixinGuiIngame {
 
     private static final String TARGET = "Lnet/minecraft/scoreboard/ScorePlayerTeam;" +
-            "formatPlayerName(Lnet/minecraft/scoreboard/Team;Ljava/lang/String;)Ljava/lang/String;";
-    @Redirect(method="renderScoreboard", at=@At(value="INVOKE", target=TARGET))
+        "formatPlayerName(Lnet/minecraft/scoreboard/Team;Ljava/lang/String;)Ljava/lang/String;";
+
+    @Redirect(method = "renderScoreboard", at = @At(value = "INVOKE", target = TARGET))
     public String renderScoreboard_formatPlayerName(Team team, String name) {
-        if(NotEnoughUpdates.INSTANCE.isOnSkyblock() && NotEnoughUpdates.INSTANCE.config.misc.streamerMode) {
+        if (NotEnoughUpdates.INSTANCE.isOnSkyblock() && NotEnoughUpdates.INSTANCE.config.misc.streamerMode) {
             return StreamerMode.filterScoreboard(ScorePlayerTeam.formatPlayerName(team, name));
         }
         return ScorePlayerTeam.formatPlayerName(team, name);

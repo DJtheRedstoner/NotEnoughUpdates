@@ -11,56 +11,56 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 public class MixinEntityRenderer {
 
     //orientCamera
-    @ModifyVariable(method="orientCamera", at=@At(value="STORE"), ordinal = 0)
+    @ModifyVariable(method = "orientCamera", at = @At(value = "STORE"), ordinal = 0)
     public double orientCamera_d0(double d0) {
         Vector3f currentPosition = CustomItemEffects.INSTANCE.getCurrentPosition();
-        if(currentPosition != null) {
+        if (currentPosition != null) {
             return currentPosition.x;
         }
         return d0;
     }
 
-    @ModifyVariable(method="orientCamera", at=@At(value="STORE"), ordinal = 1)
+    @ModifyVariable(method = "orientCamera", at = @At(value = "STORE"), ordinal = 1)
     public double orientCamera_d1(double d1) {
         Vector3f currentPosition = CustomItemEffects.INSTANCE.getCurrentPosition();
-        if(currentPosition != null) {
+        if (currentPosition != null) {
             return currentPosition.y;
         }
         return d1;
     }
 
-    @ModifyVariable(method="orientCamera", at=@At(value="STORE"), ordinal = 2)
+    @ModifyVariable(method = "orientCamera", at = @At(value = "STORE"), ordinal = 2)
     public double orientCamera_d2(double d2) {
         Vector3f currentPosition = CustomItemEffects.INSTANCE.getCurrentPosition();
-        if(currentPosition != null) {
+        if (currentPosition != null) {
             return currentPosition.z;
         }
         return d2;
     }
 
     //renderWorldPass
-    @ModifyVariable(method="renderWorldPass", at=@At(value="STORE"), ordinal = 0)
+    @ModifyVariable(method = "renderWorldPass", at = @At(value = "STORE"), ordinal = 0)
     public double renderWorldPass_d0(double d0) {
         Vector3f currentPosition = CustomItemEffects.INSTANCE.getCurrentPosition();
-        if(currentPosition != null) {
+        if (currentPosition != null) {
             return currentPosition.x;
         }
         return d0;
     }
 
-    @ModifyVariable(method="renderWorldPass", at=@At(value="STORE"), ordinal = 1)
+    @ModifyVariable(method = "renderWorldPass", at = @At(value = "STORE"), ordinal = 1)
     public double renderWorldPass_d1(double d1) {
         Vector3f currentPosition = CustomItemEffects.INSTANCE.getCurrentPosition();
-        if(currentPosition != null) {
+        if (currentPosition != null) {
             return currentPosition.y;
         }
         return d1;
     }
 
-    @ModifyVariable(method="renderWorldPass", at=@At(value="STORE"), ordinal = 2)
+    @ModifyVariable(method = "renderWorldPass", at = @At(value = "STORE"), ordinal = 2)
     public double renderWorldPass_d2(double d2) {
         Vector3f currentPosition = CustomItemEffects.INSTANCE.getCurrentPosition();
-        if(currentPosition != null) {
+        if (currentPosition != null) {
             return currentPosition.z;
         }
         return d2;

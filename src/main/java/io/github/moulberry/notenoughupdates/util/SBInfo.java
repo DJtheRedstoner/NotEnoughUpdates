@@ -2,7 +2,6 @@ package io.github.moulberry.notenoughupdates.util;
 
 import com.google.gson.JsonObject;
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates;
-import io.github.moulberry.notenoughupdates.miscfeatures.EnchantingSolvers;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.client.network.NetworkPlayerInfo;
@@ -17,7 +16,6 @@ import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -60,9 +58,9 @@ public class SBInfo {
 
     @SubscribeEvent
     public void onGuiOpen(GuiOpenEvent event) {
-        if(!NotEnoughUpdates.INSTANCE.hasSkyblockScoreboard()) return;
+        if (!NotEnoughUpdates.INSTANCE.hasSkyblockScoreboard()) return;
 
-        if(event.gui instanceof GuiChest) {
+        if (event.gui instanceof GuiChest) {
             GuiChest chest = (GuiChest) event.gui;
             ContainerChest container = (ContainerChest) chest.inventorySlots;
             String containerName = container.getLowerChestInventory().getDisplayName().getUnformattedText();
@@ -83,7 +81,7 @@ public class SBInfo {
     private static final Pattern JSON_BRACKET_PATTERN = Pattern.compile("\\{.+}");
 
     public void onSendChatMessage(String msg) {
-        if(msg.trim().startsWith("/locraw") || msg.trim().startsWith("/locraw ")) {
+        if (msg.trim().startsWith("/locraw") || msg.trim().startsWith("/locraw ")) {
             lastManualLocRaw = System.currentTimeMillis();
         }
     }
@@ -91,24 +89,24 @@ public class SBInfo {
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
     public void onChatMessage(ClientChatReceivedEvent event) {
         Matcher matcher = JSON_BRACKET_PATTERN.matcher(event.message.getUnformattedText());
-        if(matcher.find()) {
+        if (matcher.find()) {
             try {
                 JsonObject obj = NotEnoughUpdates.INSTANCE.manager.gson.fromJson(matcher.group(), JsonObject.class);
-                if(obj.has("server")) {
-                    if(System.currentTimeMillis() - lastManualLocRaw > 5000) event.setCanceled(true);
-                    if(obj.has("gametype") && obj.has("mode") && obj.has("map")) {
+                if (obj.has("server")) {
+                    if (System.currentTimeMillis() - lastManualLocRaw > 5000) event.setCanceled(true);
+                    if (obj.has("gametype") && obj.has("mode") && obj.has("map")) {
                         locraw = obj;
                         mode = locraw.get("mode").getAsString();
                     }
                 }
-            } catch(Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
     public String getLocation() {
-        if(mode == null) {
+        if (mode == null) {
             return null;
         }
         return mode;
@@ -117,20 +115,20 @@ public class SBInfo {
     public void tick() {
         long currentTime = System.currentTimeMillis();
 
-        if(Minecraft.getMinecraft().thePlayer != null &&
-                Minecraft.getMinecraft().theWorld != null &&
-                locraw == null &&
-                (currentTime - joinedWorld) > 1000 &&
-                (currentTime - lastLocRaw) > 15000) {
+        if (Minecraft.getMinecraft().thePlayer != null &&
+            Minecraft.getMinecraft().theWorld != null &&
+            locraw == null &&
+            (currentTime - joinedWorld) > 1000 &&
+            (currentTime - lastLocRaw) > 15000) {
             lastLocRaw = System.currentTimeMillis();
             NotEnoughUpdates.INSTANCE.sendChatMessage("/locraw");
         }
 
         try {
-            for(NetworkPlayerInfo info : Minecraft.getMinecraft().thePlayer.sendQueue.getPlayerInfoMap()) {
+            for (NetworkPlayerInfo info : Minecraft.getMinecraft().thePlayer.sendQueue.getPlayerInfoMap()) {
                 String name = Minecraft.getMinecraft().ingameGUI.getTabList().getPlayerName(info);
                 final String profilePrefix = "\u00a7r\u00a7e\u00a7lProfile: \u00a7r\u00a7a";
-                if(name.startsWith(profilePrefix)) {
+                if (name.startsWith(profilePrefix)) {
                     currentProfile = Utils.cleanColour(name.substring(profilePrefix.length()));
                 }
             }
@@ -142,38 +140,39 @@ public class SBInfo {
             List<Score> scores = new ArrayList<>(scoreboard.getSortedScores(sidebarObjective));
 
             List<String> lines = new ArrayList<>();
-            for(int i=scores.size()-1; i>=0; i--) {
+            for (int i = scores.size() - 1; i >= 0; i--) {
                 Score score = scores.get(i);
                 ScorePlayerTeam scoreplayerteam1 = scoreboard.getPlayersTeam(score.getPlayerName());
                 String line = ScorePlayerTeam.formatPlayerName(scoreplayerteam1, score.getPlayerName());
                 line = Utils.cleanDuplicateColourCodes(line);
                 lines.add(line);
             }
-            if(lines.size() >= 5) {
+            if (lines.size() >= 5) {
                 date = Utils.cleanColour(lines.get(1)).trim();
                 //§74:40am
                 Matcher matcher = timePattern.matcher(lines.get(2));
-                if(matcher.find()) {
+                if (matcher.find()) {
                     time = Utils.cleanColour(matcher.group()).trim();
                     try {
                         String timeSpace = time.replace("am", " am").replace("pm", " pm");
                         SimpleDateFormat parseFormat = new SimpleDateFormat("hh:mm a");
                         currentTimeDate = parseFormat.parse(timeSpace);
-                    } catch (ParseException e) {}
+                    } catch (ParseException e) {
+                    }
                 }
                 location = Utils.cleanColour(lines.get(3)).replaceAll("[^A-Za-z0-9() ]", "").trim();
             }
             objective = null;
 
             boolean objTextLast = false;
-            for(String line : lines) {
-                if(objTextLast) {
+            for (String line : lines) {
+                if (objTextLast) {
                     objective = line;
                 }
 
                 objTextLast = line.equals("Objective");
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

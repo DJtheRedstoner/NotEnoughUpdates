@@ -2,12 +2,10 @@ package io.github.moulberry.notenoughupdates.overlays;
 
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Ordering;
-import com.google.gson.JsonObject;
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates;
 import io.github.moulberry.notenoughupdates.core.config.Position;
 import io.github.moulberry.notenoughupdates.core.util.StringUtils;
 import io.github.moulberry.notenoughupdates.core.util.lerp.LerpUtils;
-import io.github.moulberry.notenoughupdates.cosmetics.CapeManager;
 import io.github.moulberry.notenoughupdates.util.SBInfo;
 import io.github.moulberry.notenoughupdates.util.Utils;
 import net.minecraft.client.Minecraft;
@@ -36,46 +34,47 @@ public class MiningOverlay extends TextOverlay {
     }
 
     private static final Pattern NUMBER_PATTERN = Pattern.compile("\\d+");
-    private static Map<String, Integer> commissionMaxes = new HashMap<>();
+    private static final Map<String, Integer> commissionMaxes = new HashMap<>();
     public static Map<String, Float> commissionProgress = new LinkedHashMap<>();
 
     @Override
     public void update() {
-        if(Minecraft.getMinecraft().currentScreen instanceof GuiChest) {
+        if (Minecraft.getMinecraft().currentScreen instanceof GuiChest) {
             GuiChest chest = (GuiChest) Minecraft.getMinecraft().currentScreen;
             ContainerChest container = (ContainerChest) chest.inventorySlots;
             IInventory lower = container.getLowerChestInventory();
             String containerName = lower.getDisplayName().getUnformattedText();
 
-            if(containerName.equals("Commissions") && lower.getSizeInventory() >= 18) {
-                for(int i=9; i<18; i++) {
+            if (containerName.equals("Commissions") && lower.getSizeInventory() >= 18) {
+                for (int i = 9; i < 18; i++) {
                     ItemStack stack = lower.getStackInSlot(i);
-                    if(stack != null && stack.hasTagCompound()) {
+                    if (stack != null && stack.hasTagCompound()) {
                         String[] lore = NotEnoughUpdates.INSTANCE.manager.getLoreFromNBT(stack.getTagCompound());
                         String name = null;
                         int numberValue = -1;
-                        for(String line : lore) {
-                            if(line.startsWith("\u00a77\u00a79")) {
+                        for (String line : lore) {
+                            if (line.startsWith("\u00a77\u00a79")) {
                                 String textAfter = line.substring(4);
-                                if(!textAfter.contains("\u00a7") && !textAfter.equals("Rewards") && !textAfter.equals("Progress")) {
+                                if (!textAfter.contains("\u00a7") && !textAfter.equals("Rewards") && !textAfter.equals("Progress")) {
                                     name = textAfter;
                                 }
                             }
-                            if(name != null) {
+                            if (name != null) {
                                 String clean = Utils.cleanColour(line).trim();
-                                if(clean.isEmpty()) {
+                                if (clean.isEmpty()) {
                                     break;
                                 } else {
                                     Matcher matcher = NUMBER_PATTERN.matcher(clean);
-                                    if(matcher.find()) {
+                                    if (matcher.find()) {
                                         try {
                                             numberValue = Integer.parseInt(matcher.group());
-                                        } catch(NumberFormatException ignored) {}
+                                        } catch (NumberFormatException ignored) {
+                                        }
                                     }
                                 }
                             }
                         }
-                        if(name != null && numberValue > 0) {
+                        if (name != null && numberValue > 0) {
                             commissionMaxes.put(name, numberValue);
                         }
                     }
@@ -151,9 +150,9 @@ public class MiningOverlay extends TextOverlay {
             }
         }*/
 
-        if(!NotEnoughUpdates.INSTANCE.config.mining.dwarvenOverlay) return;
-        if(SBInfo.getInstance().getLocation() == null) return;
-        if(!SBInfo.getInstance().getLocation().equals("mining_3")) return;
+        if (!NotEnoughUpdates.INSTANCE.config.mining.dwarvenOverlay) return;
+        if (SBInfo.getInstance().getLocation() == null) return;
+        if (!SBInfo.getInstance().getLocation().equals("mining_3")) return;
 
         overlayStrings = new ArrayList<>();
         commissionProgress.clear();
@@ -164,42 +163,43 @@ public class MiningOverlay extends TextOverlay {
         boolean commissions = false;
         boolean forges = false;
         List<NetworkPlayerInfo> players = playerOrdering.sortedCopy(Minecraft.getMinecraft().thePlayer.sendQueue.getPlayerInfoMap());
-        for(NetworkPlayerInfo info : players) {
+        for (NetworkPlayerInfo info : players) {
             String name = Minecraft.getMinecraft().ingameGUI.getTabList().getPlayerName(info);
-            if(name.contains("Mithril Powder:")) {
-                mithrilPowder = DARK_AQUA+Utils.trimIgnoreColour(name).replaceAll("\u00a7[f|F|r]", "");
+            if (name.contains("Mithril Powder:")) {
+                mithrilPowder = DARK_AQUA + Utils.trimIgnoreColour(name).replaceAll("\u00a7[f|F|r]", "");
             }
-            if(name.equals(RESET.toString()+BLUE+BOLD+"Forges"+RESET)) {
+            if (name.equals(RESET.toString() + BLUE + BOLD + "Forges" + RESET)) {
                 commissions = false;
                 forges = true;
                 continue;
-            } else if(name.equals(RESET.toString()+BLUE+BOLD+"Commissions"+RESET)) {
+            } else if (name.equals(RESET.toString() + BLUE + BOLD + "Commissions" + RESET)) {
                 commissions = true;
                 forges = false;
                 continue;
             }
             String clean = StringUtils.cleanColour(name);
-            if(forges && clean.startsWith(" ")) {
+            if (forges && clean.startsWith(" ")) {
                 char firstChar = clean.trim().charAt(0);
-                if(firstChar < '0' || firstChar > '9') {
+                if (firstChar < '0' || firstChar > '9') {
                     forges = false;
                 } else {
-                    if(name.contains("LOCKED")) continue;
-                    if(name.contains("EMPTY")) {
-                        forgeStringsEmpty.add(DARK_AQUA+"Forge "+ Utils.trimIgnoreColour(name).replaceAll("\u00a7[f|F|r]", ""));
+                    if (name.contains("LOCKED")) continue;
+                    if (name.contains("EMPTY")) {
+                        forgeStringsEmpty.add(DARK_AQUA + "Forge " + Utils.trimIgnoreColour(name).replaceAll("\u00a7[f|F|r]", ""));
                     } else {
-                        forgeStrings.add(DARK_AQUA+"Forge "+ Utils.trimIgnoreColour(name).replaceAll("\u00a7[f|F|r]", ""));
+                        forgeStrings.add(DARK_AQUA + "Forge " + Utils.trimIgnoreColour(name).replaceAll("\u00a7[f|F|r]", ""));
                     }
                 }
-            } else if(commissions && clean.startsWith(" ")) {
+            } else if (commissions && clean.startsWith(" ")) {
                 String[] split = clean.trim().split(": ");
-                if(split.length == 2) {
-                    if(split[1].endsWith("%")) {
+                if (split.length == 2) {
+                    if (split[1].endsWith("%")) {
                         try {
-                            float progress = Float.parseFloat(split[1].replace("%", ""))/100;
+                            float progress = Float.parseFloat(split[1].replace("%", "")) / 100;
                             progress = LerpUtils.clampZeroOne(progress);
                             commissionProgress.put(split[0], progress);
-                        } catch(Exception ignored) {}
+                        } catch (Exception ignored) {
+                        }
                     } else {
                         commissionProgress.put(split[0], 1.0f);
                     }
@@ -211,25 +211,25 @@ public class MiningOverlay extends TextOverlay {
         }
 
         List<String> commissionsStrings = new ArrayList<>();
-        for(Map.Entry<String, Float> entry : commissionProgress.entrySet()) {
-            if(entry.getValue() >= 1) {
-                commissionsStrings.add(DARK_AQUA+entry.getKey() + ": " + GREEN + "DONE");
+        for (Map.Entry<String, Float> entry : commissionProgress.entrySet()) {
+            if (entry.getValue() >= 1) {
+                commissionsStrings.add(DARK_AQUA + entry.getKey() + ": " + GREEN + "DONE");
             } else {
                 EnumChatFormatting col = RED;
-                if(entry.getValue() >= 0.75) {
+                if (entry.getValue() >= 0.75) {
                     col = GREEN;
-                } else if(entry.getValue() >= 0.5) {
+                } else if (entry.getValue() >= 0.5) {
                     col = YELLOW;
-                } else if(entry.getValue() >= 0.25) {
+                } else if (entry.getValue() >= 0.25) {
                     col = GOLD;
                 }
-                if(true && commissionMaxes.containsKey(entry.getKey())) {
+                if (true && commissionMaxes.containsKey(entry.getKey())) {
                     int max = commissionMaxes.get(entry.getKey());
-                    commissionsStrings.add(DARK_AQUA+entry.getKey() + ": " + col+Math.round(entry.getValue()*max)+"/"+max);
+                    commissionsStrings.add(DARK_AQUA + entry.getKey() + ": " + col + Math.round(entry.getValue() * max) + "/" + max);
                 } else {
-                    String valS = Utils.floatToString(entry.getValue()*100, 1);
+                    String valS = Utils.floatToString(entry.getValue() * 100, 1);
 
-                    commissionsStrings.add(DARK_AQUA+entry.getKey() + ": " + col+valS+"%");
+                    commissionsStrings.add(DARK_AQUA + entry.getKey() + ": " + col + valS + "%");
                 }
             }
         }
@@ -250,36 +250,41 @@ public class MiningOverlay extends TextOverlay {
             overlayStrings.addAll(forgeStrings);
         }*/
 
-        for(int index : NotEnoughUpdates.INSTANCE.config.mining.dwarvenText) {
-            switch(index) {
+        for (int index : NotEnoughUpdates.INSTANCE.config.mining.dwarvenText) {
+            switch (index) {
                 case 0:
-                    overlayStrings.addAll(commissionsStrings); break;
+                    overlayStrings.addAll(commissionsStrings);
+                    break;
                 case 1:
-                    overlayStrings.add(mithrilPowder); break;
+                    overlayStrings.add(mithrilPowder);
+                    break;
                 case 2:
-                    overlayStrings.addAll(forgeStrings); break;
+                    overlayStrings.addAll(forgeStrings);
+                    break;
                 case 3:
-                    overlayStrings.addAll(forgeStringsEmpty); break;
+                    overlayStrings.addAll(forgeStringsEmpty);
+                    break;
             }
         }
 
-        if(overlayStrings.isEmpty()) overlayStrings = null;
+        if (overlayStrings.isEmpty()) overlayStrings = null;
     }
 
     private static final Ordering<NetworkPlayerInfo> playerOrdering = Ordering.from(new PlayerComparator());
 
     @SideOnly(Side.CLIENT)
     static class PlayerComparator implements Comparator<NetworkPlayerInfo> {
-        private PlayerComparator() { }
+        private PlayerComparator() {
+        }
 
         public int compare(NetworkPlayerInfo o1, NetworkPlayerInfo o2) {
             ScorePlayerTeam team1 = o1.getPlayerTeam();
             ScorePlayerTeam team2 = o2.getPlayerTeam();
             return ComparisonChain.start().compareTrueFirst(
-                    o1.getGameType() != WorldSettings.GameType.SPECTATOR,
-                    o2.getGameType() != WorldSettings.GameType.SPECTATOR)
-                            .compare(team1 != null ? team1.getRegisteredName() : "", team2 != null ? team2.getRegisteredName() : "")
-                            .compare(o1.getGameProfile().getName(), o2.getGameProfile().getName()).result();
+                o1.getGameType() != WorldSettings.GameType.SPECTATOR,
+                o2.getGameType() != WorldSettings.GameType.SPECTATOR)
+                .compare(team1 != null ? team1.getRegisteredName() : "", team2 != null ? team2.getRegisteredName() : "")
+                .compare(o1.getGameProfile().getName(), o2.getGameProfile().getName()).result();
         }
     }
 

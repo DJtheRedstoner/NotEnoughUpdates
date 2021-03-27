@@ -1,7 +1,6 @@
 package io.github.moulberry.notenoughupdates.mixins;
 
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates;
-import io.github.moulberry.notenoughupdates.miscfeatures.ItemCooldowns;
 import io.github.moulberry.notenoughupdates.util.Utils;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -15,9 +14,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin({ItemStack.class})
 public class MixinItemStack {
 
-    @Inject(method="hasEffect", at=@At("HEAD"), cancellable = true)
+    @Inject(method = "hasEffect", at = @At("HEAD"), cancellable = true)
     public void hasEffect(CallbackInfoReturnable cir) {
-        if(Utils.getHasEffectOverride()) {
+        if (Utils.getHasEffectOverride()) {
             cir.setReturnValue(false);
         }
     }
@@ -25,16 +24,16 @@ public class MixinItemStack {
     @Shadow
     private NBTTagCompound stackTagCompound;
 
-    @Inject(method="getDisplayName",at=@At("HEAD"), cancellable=true)
+    @Inject(method = "getDisplayName", at = @At("HEAD"), cancellable = true)
     public void getDisplayName(CallbackInfoReturnable<String> returnable) {
         try {
-            if(stackTagCompound == null || !stackTagCompound.hasKey("ExtraAttributes", 10)) {
+            if (stackTagCompound == null || !stackTagCompound.hasKey("ExtraAttributes", 10)) {
                 return;
             }
 
             String customName = NotEnoughUpdates.INSTANCE.manager.itemRenameJson
-                    .get(stackTagCompound.getCompoundTag("ExtraAttributes").getString("uuid")).getAsString();
-            if(customName != null && !customName.equals("")) {
+                .get(stackTagCompound.getCompoundTag("ExtraAttributes").getString("uuid")).getAsString();
+            if (customName != null && !customName.equals("")) {
                 String prefix = EnumChatFormatting.RESET.toString();
                 if (stackTagCompound != null && stackTagCompound.hasKey("display", 10)) {
                     NBTTagCompound nbttagcompound = stackTagCompound.getCompoundTag("display");
@@ -44,8 +43,8 @@ public class MixinItemStack {
                         char[] chars = name.toCharArray();
 
                         int i;
-                        for(i=0; i<chars.length; i+=2) {
-                            if(chars[i] != '\u00a7'){
+                        for (i = 0; i < chars.length; i += 2) {
+                            if (chars[i] != '\u00a7') {
                                 break;
                             }
                         }
@@ -53,9 +52,10 @@ public class MixinItemStack {
                         prefix = name.substring(0, i);
                     }
                 }
-                returnable.setReturnValue(prefix+customName);
+                returnable.setReturnValue(prefix + customName);
             }
-        } catch(Exception e) { }
+        } catch (Exception e) {
+        }
     }
 
 

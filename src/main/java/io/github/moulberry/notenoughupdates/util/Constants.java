@@ -15,7 +15,7 @@ public class Constants {
     public static JsonObject ESSENCECOSTS;
     public static JsonObject FAIRYSOULS;
     public static JsonObject REFORGESTONES;
-    
+
     public static void reload() {
         BONUSES = Utils.getConstant("bonuses");
         DISABLE = Utils.getConstant("disable");
